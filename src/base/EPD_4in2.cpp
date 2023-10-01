@@ -1429,23 +1429,6 @@ void EPD_4IN2_PartialDisplay_step1(UWORD X_start, UWORD Y_start, UWORD X_end, UW
         }
     }
 
-
-    // EPD_4IN2_SendCommand(0x13);
-    // // writes New data to SRAM.
-    // for (UWORD j = 0; j < Y_end - Y_start; j++)
-    // {
-    //     for (UWORD i = 0; i < (X_end - X_start) / 8; i++)
-    //     {
-    //         // image中对应位置的取反，发送
-    //         EPD_4IN2_SendData(~Image[(Y_start + j) * Width + X_start / 8 + i]);
-    //         //
-    //         // DATA[(Y_start + j) * Width + X_start / 8 + i] = ~Image[(Y_start + j) * Width + X_start / 8 + i];
-    //     }
-    // }
-
-    // EPD_4IN2_SendCommand(0x12); // DISPLAY REFRESH
-    // DEV_Delay_ms(10);           // The delay here is necessary, 200uS at least!!!
-    // EPD_4IN2_TurnOnDisplay();
 }
 
 
@@ -1458,30 +1441,6 @@ void EPD_4IN2_PartialDisplay_step2(UWORD X_start, UWORD Y_start, UWORD X_end, UW
     X_start = (X_start % 8 == 0) ? (X_start) : (X_start / 8 * 8 + 8);
     X_end = (X_end % 8 == 0) ? (X_end) : (X_end / 8 * 8 + 8);
 
-    // EPD_4IN2_SendCommand(0x91); // This command makes the display enter partial mode
-    // EPD_4IN2_SendCommand(0x90); // resolution setting
-    // EPD_4IN2_SendData((X_start) / 256);
-    // EPD_4IN2_SendData((X_start) % 256); // x-start
-    // EPD_4IN2_SendData((X_end) / 256);
-    // EPD_4IN2_SendData((X_end) % 256 - 1); // x-end
-    // EPD_4IN2_SendData(Y_start / 256);
-    // EPD_4IN2_SendData(Y_start % 256); // y-start
-    // EPD_4IN2_SendData(Y_end / 256);
-    // EPD_4IN2_SendData(Y_end % 256 - 1); // y-end
-    // EPD_4IN2_SendData(0x28);
-
-
-    // EPD_4IN2_SendCommand(0x10);
-    // // writes Old data to SRAM for programming
-    // for (UWORD j = 0; j < Y_end - Y_start; j++)
-    // {
-    //     for (UWORD i = 0; i < (X_end - X_start) / 8; i++)
-    //     {
-    //         // 遍历更新区域的字节
-    //         EPD_4IN2_SendData(DATA[(Y_start + j) * Width + X_start / 8 + i]);
-    //     }
-    // }
-
 
     EPD_4IN2_SendCommand(0x13);
     // writes New data to SRAM.
@@ -1489,10 +1448,7 @@ void EPD_4IN2_PartialDisplay_step2(UWORD X_start, UWORD Y_start, UWORD X_end, UW
     {
         for (UWORD i = 0; i < (X_end - X_start) / 8; i++)
         {
-            // image中对应位置的取反，发送
             EPD_4IN2_SendData(~Image[(Y_start + j) * Width + X_start / 8 + i]);
-            //
-            // DATA[(Y_start + j) * Width + X_start / 8 + i] = ~Image[(Y_start + j) * Width + X_start / 8 + i];
         }
     }
 

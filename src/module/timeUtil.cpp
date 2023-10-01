@@ -67,7 +67,7 @@ time_t getNtpTime()
 
 
 // 将时间戳转换为本地时间
-void updataTime()
+void updataTime(PAINT_TIME &sPaint_time)
 {
     time_t timestamp = getNtpTime();
     struct tm timeinfo;
@@ -82,20 +82,20 @@ void updataTime()
     sPaint_time.Sec = timeinfo.tm_sec;
     sPaint_time.Week = timeinfo.tm_wday;
 
-    // Serial.print("Year: ");
-    // Serial.print(timeinfo.tm_year + 1900);
-    // Serial.print("Month: ");
-    // Serial.print(timeinfo.tm_mon + 1);
-    // Serial.print("Day: ");
-    // Serial.print(timeinfo.tm_mday);
-    // Serial.print("Hour: ");
-    // Serial.print(timeinfo.tm_hour);
-    // Serial.print("Minute: ");
-    // Serial.print(timeinfo.tm_min);
-    // Serial.print("Second: ");
-    // Serial.print(timeinfo.tm_sec);
-    // Serial.print("Weekday: ");
-    // Serial.print(timeinfo.tm_wday);
+    Serial.print("Year: ");
+    Serial.print(timeinfo.tm_year + 1900);
+    Serial.print("Month: ");
+    Serial.print(timeinfo.tm_mon + 1);
+    Serial.print("Day: ");
+    Serial.print(timeinfo.tm_mday);
+    Serial.print("Hour: ");
+    Serial.print(timeinfo.tm_hour);
+    Serial.print("Minute: ");
+    Serial.print(timeinfo.tm_min);
+    Serial.print("Second: ");
+    Serial.print(timeinfo.tm_sec);
+    Serial.print("Weekday: ");
+    Serial.print(timeinfo.tm_wday);
 }
 
 

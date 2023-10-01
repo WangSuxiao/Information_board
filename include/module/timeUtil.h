@@ -6,9 +6,9 @@
 #include "board/GUI_Paint.h"
 
 extern WiFiUDP udp;
-extern PAINT_TIME sPaint_time;
+// extern PAINT_TIME sPaint_time;
 
-void updataTime();
+void updataTime(PAINT_TIME &sPaint_time);
 
 
 #endif
