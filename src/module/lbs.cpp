@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-09-26 09:10:55
- * @LastEditTime : 2023-09-30 15:57:49
+ * @LastEditTime : 2023-10-02 16:49:12
  * @Description  : 定位服务
  * @Tips         :
  */
@@ -104,7 +104,6 @@ bool getLocationByWIFI(DynamicJsonDocument &doc)
     return true;
 }
 
-
 bool getLocationByIP(DynamicJsonDocument &doc)
 {
     Serial.println("---------------getLocationByIP--------------");
@@ -143,3 +142,52 @@ bool getLocationByIP(DynamicJsonDocument &doc)
     return false;
 }
 
+void lbs(DynamicJsonDocument &doc, City &city)
+{
+
+    bool by_wifi = false;
+    bool by_ip = false;
+
+    Serial.println("setup : Get Location By IP");
+    by_ip = getLocationByIP(doc);
+    if (by_ip)
+    {
+        city.lon = doc["content"]["point"]["x"].as<String>();
+        city.lat = doc["content"]["point"]["y"].as<String>();
+        city.cityName = doc["content"]["address_detail"]["city"].as<String>();
+        city.address = doc["content"]["address"].as<String>();
+        if (city.cityName.isEmpty())
+        {
+            city.cityName = city.address;
+        }
+        Serial.println(city.lon);
+        Serial.println(city.lat);
+        Serial.println(city.cityName);
+        Serial.println(city.address);
+        city.cityName.replace("\\u", "%u");
+        city.cityName = urlDecode(city.cityName);
+        city.address.replace("\\u", "%u");
+        city.address = urlDecode(city.address);
+        Serial.println(city.cityName);
+        Serial.println(city.address);
+    }
+
+    // LBS : WIFI定位
+    Serial.println("setup : Get Location By WIFI");
+    by_wifi = getLocationByWIFI(doc);
+    if (by_wifi)
+    {
+        city.lat = doc["lat"].as<String>();
+        city.lon = doc["lon"].as<String>();
+        ;
+        if(! doc["address"].as<String>().isEmpty()){
+            city.address = doc["address"].as<String>();
+        }
+
+    }
+    Serial.println(city.lon);
+    Serial.println(city.lat);
+    Serial.println(city.address);
+
+    String cID = "";
+}
