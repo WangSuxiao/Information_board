@@ -22,18 +22,18 @@ PAINT_TIME sPaint_time;
 bool WIFILOCATION = false;
 bool IPLOCATION = false;
 
-String lon = "";
-String lat = "";
+// String lon = "";
+// String lat = "";
 String cityId = "101190405";
-String cityName = "";
-String address = "";
-City city = {
-    lon,
-    lat,
-    cityId,
-    cityName,
-    address};
-
+// String cityName = "";
+// String address = "";
+// City city = {
+//     "lon",
+//     lat,
+//     cityId,
+//     cityName,
+//     address};
+City city;
 DynamicJsonDocument doc(4096);
 
 Scheduler scheduler;
@@ -94,107 +94,123 @@ void update_realweather_task()
 {
     configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
-    // Serial.println("===============================================================");
-    // Serial.println("update_realweather_task");
-    // String res = requireWeather("/weather/now", city);
-    // DeserializationError resultCode = deserializeJson(doc, res);
-    // if (resultCode == DeserializationError::Ok)
-    // {
-    //     String temp = doc["temp"].as<String>();
-    //     String city = doc["city"].as<String>();
-    //     String wind_d = doc["wind_d"].as<String>();
-    //     String wind_s = doc["wind_s"].as<String>();
-    //     String humidity = doc["humidity"].as<String>();
-    //     String air_press = doc["air_press"].as<String>();
-    //     String weather = doc["weather"].as<String>();
-    //     String source = doc["source"].as<String>();
-    //     int icon = doc["icon"].as<int>();
-    //     Serial.println(weather);
-    //     Serial.println(temp);
-    //     Serial.println(humidity);
-    //     Serial.println(icon);
-    //     draw_RealtimeWeather(weather, temp, humidity, icon);
-    // }
-    // EPD_4IN2_Init_Fast();
-    // EPD_4IN2_Display(BlackImage);
-    // EPD_4IN2_Sleep();
+    Serial.println("===============================================================");
+    Serial.println("update_realweather_task");
+    String res = requireWeather("/weather/now", city);
+    DeserializationError resultCode = deserializeJson(doc, res);
+    if (resultCode == DeserializationError::Ok)
+    {
+        String temp = doc["temp"].as<String>();
+        String city = doc["city"].as<String>();
+        String wind_d = doc["wind_d"].as<String>();
+        String wind_s = doc["wind_s"].as<String>();
+        String humidity = doc["humidity"].as<String>();
+        String air_press = doc["air_press"].as<String>();
+        String weather = doc["weather"].as<String>();
+        String source = doc["source"].as<String>();
+        int icon = doc["icon"].as<int>();
+        Serial.println(weather);
+        Serial.println(temp);
+        Serial.println(humidity);
+        Serial.println(icon);
+        draw_RealtimeWeather(weather, temp, humidity, icon);
+    }
+    EPD_4IN2_Init_Fast();
+    EPD_4IN2_Display(BlackImage);
+    EPD_4IN2_Sleep();
 }
 
 // 未来天气
 void update_futureweather_task()
 {
-    // Serial.println("update_futureweather_task");
-    // EPD_4IN2_Init_Partial();
-    // std::vector<HourlyWeather> hourlyWeatherData = getWeatherInfo(doc, "/weather/today", city);
-    // draw_FutureWeather(hourlyWeatherData);
-    // EPD_4IN2_Init_Fast();
-    // EPD_4IN2_Display(BlackImage);
-    // EPD_4IN2_Sleep();
-
+    Serial.println("update_futureweather_task");
+    EPD_4IN2_Init_Partial();
+    std::vector<HourlyWeather> hourlyWeatherData = getWeatherInfo(doc, "/weather/today", city);
+    draw_FutureWeather(hourlyWeatherData);
     EPD_4IN2_Init_Fast();
     EPD_4IN2_Display(BlackImage);
     EPD_4IN2_Sleep();
+
+    // EPD_4IN2_Init_Fast();
+    // EPD_4IN2_Display(BlackImage);
+    // EPD_4IN2_Sleep();
 }
 
 Task update_time(1000 * 1, TASK_FOREVER, &update_time_task);
 Task update_realweather(1000 * 60 * 10, TASK_FOREVER, &update_realweather_task);
 Task update_futureweather(1000 * 60 * 15, TASK_FOREVER, &update_futureweather_task);
 
+void lbs(DynamicJsonDocument &doc, City &city)
+{
+
+    bool by_wifi = false;
+    bool by_ip = false;
+
+    Serial.println("setup : Get Location By IP");
+    by_ip = getLocationByIP(doc);
+    if (by_ip)
+    {
+        city.lon = doc["content"]["point"]["x"].as<String>();
+        city.lat = doc["content"]["point"]["y"].as<String>();
+        city.cityName = doc["content"]["address_detail"]["city"].as<String>();
+        city.address = doc["content"]["address"].as<String>();
+        if (city.cityName.isEmpty())
+        {
+            city.cityName = city.address;
+        }
+        Serial.println(city.lon);
+        Serial.println(city.lat);
+        Serial.println(city.cityName);
+        Serial.println(city.address);
+        city.cityName.replace("\\u", "%u");
+        city.cityName = urlDecode(city.cityName);
+        city.address.replace("\\u", "%u");
+        city.address = urlDecode(city.address);
+        Serial.println(city.cityName);
+        Serial.println(city.address);
+    }
+
+    // LBS : WIFI定位
+    Serial.println("setup : Get Location By WIFI");
+    by_wifi = getLocationByWIFI(doc);
+    if (by_wifi)
+    {
+        city.lat = doc["lat"].as<String>();
+        city.lon = doc["lon"].as<String>();
+        ;
+        if(! doc["address"].as<String>().isEmpty()){
+            city.address = doc["address"].as<String>();
+        }
+
+    }
+    Serial.println(city.lon);
+    Serial.println(city.lat);
+    Serial.println(city.address);
+
+    String cID = "";
+}
 void setup()
 {
     DEV_Module_Init(); // 文件系统、串口、SPI、GPIO初始化
 
     BlackImage = init_paint(); // 创建图像缓冲区
 
-
     // 墨水屏模块初始化并清屏
     EPD_4IN2_Init_Fast();
     EPD_4IN2_Clear(); // 清屏
     DEV_Delay_ms(500);
 
-    // wifiConnect();
-    wifiConfig(BlackImage);
+    wifiConnect();
+    // wifiConfig(BlackImage);
 
     // 配置本地时间
     configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
-    // LBS : IP定位
-    Serial.println("setup : Get Location By IP");
-    IPLOCATION = getLocationByIP(doc);
-    if (IPLOCATION)
-    {
-        lon = doc["content"]["point"]["x"].as<String>();
-        lat = doc["content"]["point"]["y"].as<String>();
-        cityName = doc["content"]["address_detail"]["city"].as<String>();
-        if (cityName.isEmpty())
-        {
-            cityName = doc["content"]["address"].as<String>();
-        }
-        Serial.println(lon);
-        Serial.println(lat);
-        Serial.println(cityName);
-        cityName.replace("\\u", "%u");
-        cityName = urlDecode(cityName);
-    }
-    delay(2000);
+    lbs(doc, city);
 
-    // LBS : WIFI定位
-    Serial.println("setup : Get Location By WIFI");
-    WIFILOCATION = getLocationByWIFI(doc);
-    if (WIFILOCATION)
-    {
-        lat = doc["lat"].as<String>();
-        lon = doc["lon"].as<String>();
-        address = doc["address"].as<String>();
-    }
-    Serial.println("---------------Location Info--------------");
-    Serial.println(lon);
-    Serial.println(lat);
-    Serial.println(cityName);
-    Serial.println(address);
-    Serial.println("------------------------------------------");
 
-    draw_Frame(BlackImage, cityName);
+
+    draw_Frame(BlackImage, city.cityName);
     // TODO :
     // draw_real_weather(doc, lon, lat, cityid);
 
