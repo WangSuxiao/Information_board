@@ -23,6 +23,13 @@ struct City
     String address;
 };
 
+struct Todo {
+  int id;
+  String start;
+  String end;
+  int level;
+  String info;
+};
 
 #define ICON_WEIGHT 32
 #define ICON_HEIGHT 32
