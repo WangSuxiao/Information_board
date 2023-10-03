@@ -1,5 +1,6 @@
 #include "board/GUI_Paint.h"
 #include "board/DEV_Config.h"
+#include "board/EPD_4in2.h"
 #include "board/Debug.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -663,8 +664,6 @@ void Paint_DrawString_EN(UWORD Xstart, UWORD Ystart, const char *pString,
     }
 }
 
-
-
 /******************************************************************************
 function:	Display nummber
 parameter:
@@ -728,11 +727,10 @@ void Paint_DrawTime(UWORD Xstart, UWORD Ystart, String time, sFONT *Font, UWORD 
     UWORD Dx = Font->Width;
     Serial.println(int(time[0]) + int(time[1]));
     Paint_DrawChar(Xstart, Ystart, time[0], Font, Color_Foreground, Color_Background, time[0] - '0');
-    Paint_DrawChar(Xstart + Dx, Ystart, time.charAt(1), Font, Color_Foreground, Color_Background,time.charAt(1) - '0');
-    Paint_DrawChar(Xstart + Dx * 2 - 2, Ystart, time.charAt(2), Font, Color_Foreground, Color_Background, 11 );
-    Paint_DrawChar(Xstart + Dx * 3 - 4, Ystart, time.charAt(3), Font, Color_Foreground, Color_Background, time.charAt(3) - '0' );
+    Paint_DrawChar(Xstart + Dx, Ystart, time.charAt(1), Font, Color_Foreground, Color_Background, time.charAt(1) - '0');
+    Paint_DrawChar(Xstart + Dx * 2 - 2, Ystart, time.charAt(2), Font, Color_Foreground, Color_Background, 11);
+    Paint_DrawChar(Xstart + Dx * 3 - 4, Ystart, time.charAt(3), Font, Color_Foreground, Color_Background, time.charAt(3) - '0');
     Paint_DrawChar(Xstart + Dx * 4 - 4, Ystart, time.charAt(4), Font, Color_Foreground, Color_Background, time.charAt(4) - '0');
-
 }
 
 void Paint_DrawWeatherTime(UWORD Xstart, UWORD Ystart, String time, sFONT *Font, UWORD Color_Foreground, UWORD Color_Background)
@@ -740,30 +738,31 @@ void Paint_DrawWeatherTime(UWORD Xstart, UWORD Ystart, String time, sFONT *Font,
     UWORD Dx = Font->Width;
     Serial.println(int(time[0]) + int(time[1]));
     Paint_DrawChar(Xstart, Ystart, time[0], Font, Color_Foreground, Color_Background, time[0] - '0');
-    Paint_DrawChar(Xstart + Dx, Ystart, time.charAt(1), Font, Color_Foreground, Color_Background,time.charAt(1) - '0');
-    Paint_DrawChar(Xstart + Dx * 2 - 2, Ystart, time.charAt(2), Font, Color_Foreground, Color_Background, 11 );
-    Paint_DrawChar(Xstart + Dx * 3 - 4, Ystart, time.charAt(3), Font, Color_Foreground, Color_Background, time.charAt(3) - '0' );
+    Paint_DrawChar(Xstart + Dx, Ystart, time.charAt(1), Font, Color_Foreground, Color_Background, time.charAt(1) - '0');
+    Paint_DrawChar(Xstart + Dx * 2 - 2, Ystart, time.charAt(2), Font, Color_Foreground, Color_Background, 11);
+    Paint_DrawChar(Xstart + Dx * 3 - 4, Ystart, time.charAt(3), Font, Color_Foreground, Color_Background, time.charAt(3) - '0');
     Paint_DrawChar(Xstart + Dx * 4 - 4, Ystart, time.charAt(4), Font, Color_Foreground, Color_Background, time.charAt(4) - '0');
-
 }
 
-void Paint_DrawWeatherInfo(UWORD Xstart, UWORD Ystart, String temp, String humidity,sFONT *Font, UWORD Color_Foreground, UWORD Color_Background)
+void Paint_DrawWeatherInfo(UWORD Xstart, UWORD Ystart, String temp, String humidity, sFONT *Font, UWORD Color_Foreground, UWORD Color_Background)
 {
     // Paint_DrawTime(150, 80, &sPaint_time, &Font20, WHITE, BLACK);
     // uint8_t value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     UWORD Dx = Font->Width;
     int index = 0;
-    for(uint8_t i=0 ; i<temp.length();i++){
+    for (uint8_t i = 0; i < temp.length(); i++)
+    {
         Paint_DrawChar(Xstart + Dx * i, Ystart, temp[i], Font, Color_Foreground, Color_Background, temp[i] - '0');
         index = i;
     }
-    Paint_DrawChar(Xstart + Dx * index + 7, Ystart, '°', Font, Color_Foreground, Color_Background, 12 );
-    Paint_DrawChar(Xstart + Dx * index + 12, Ystart, 'C', Font, Color_Foreground, Color_Background, 13 );
-    for(uint8_t i=0 ; i<humidity.length();i++){
+    Paint_DrawChar(Xstart + Dx * index + 7, Ystart, '°', Font, Color_Foreground, Color_Background, 12);
+    Paint_DrawChar(Xstart + Dx * index + 12, Ystart, 'C', Font, Color_Foreground, Color_Background, 13);
+    for (uint8_t i = 0; i < humidity.length(); i++)
+    {
         index = index + i;
-        Paint_DrawChar(Xstart + Dx * (index+1) + 14, Ystart, humidity[i], Font, Color_Foreground, Color_Background, humidity[i] - '0');
+        Paint_DrawChar(Xstart + Dx * (index + 1) + 14, Ystart, humidity[i], Font, Color_Foreground, Color_Background, humidity[i] - '0');
     }
-    Paint_DrawChar(Xstart + Dx * (index+2) + 14, Ystart, '%', Font, Color_Foreground, Color_Background, 10 );
+    Paint_DrawChar(Xstart + Dx * (index + 2) + 14, Ystart, '%', Font, Color_Foreground, Color_Background, 10);
 }
 
 /******************************************************************************
@@ -911,84 +910,6 @@ void Paint_DrawString_EN_From_File(UWORD Xstart, UWORD Ystart, const char *pStri
         Xpoint += font->Width;
     }
 }
-
-// void Paint_DrawString_CN_From_File(UWORD Xstart, UWORD Ystart, const char *pString, MYcFONT *font, UWORD Color_Foreground, UWORD Color_Background)
-// {
-//     const char *p_text = pString;
-//     int x = Xstart, y = Ystart;
-//     int i, j;
-//     Serial.println("绘制汉字字符\n");
-//     /* Send the string character by character on EPD */
-//     while (*p_text != 0)
-//     {
-
-//         // 定位成功
-//         // int Char_Offset = index_cn(font->index_file, p_text) - 1;   // 临时措施
-//         int Char_Offset = index_cn(font->index_file, p_text) ;
-//         if(Char_Offset < 0){
-//             require_char(p_text,font->index_file, font->data_file,font->font_size);
-//             Char_Offset = index_cn(font->index_file, p_text) ;
-//         }
-//         size_t len = font->Height * font->Width / 8;
-//         Serial.printf("偏移量 = %d  长度 = %d \n", Char_Offset, len);
-
-//         uint8_t dataspace[len];
-//         read(font->data_file, dataspace, len, Char_Offset * len);
-
-//         const unsigned char *ptr = dataspace; // 获得偏置值
-
-//         for (size_t k = 0; k < len; k++)
-//         {
-//             // Serial.printf("%0#x ", *ptr);
-//             ptr++;
-//         }
-//         // Serial.println("\n\n ");
-//         ptr = dataspace;
-
-//         // const char *ptr = &font->table[Num].matrix[0];
-
-//         for (j = 0; j < font->Height; j++)
-//         {
-//             for (i = 0; i < font->Width; i++)
-//             {
-//                 if (FONT_BACKGROUND == Color_Background)
-//                 { // this process is to speed up the scan
-//                     if (*ptr & (0x80 >> (i % 8)))
-//                     {
-//                         Paint_SetPixel(x + i, y + j, Color_Foreground);
-//                         // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
-//                     }
-//                 }
-//                 else
-//                 {
-//                     if (*ptr & (0x80 >> (i % 8)))
-//                     {
-//                         Paint_SetPixel(x + i, y + j, Color_Foreground);
-//                         // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
-//                     }
-//                     else
-//                     {
-//                         Paint_SetPixel(x + i, y + j, Color_Background);
-//                         // Paint_DrawPoint(x + i, y + j, Color_Background, DOT_PIXEL_DFT, DOT_STYLE_DFT);
-//                     }
-//                 }
-//                 if (i % 8 == 7)
-//                 {
-//                     ptr++;
-//                 }
-//             }
-//             if (font->Width % 8 != 0)
-//             {
-//                 ptr++;
-//             }
-//         }
-
-//         /* Point on the next character */
-//         p_text += 3;
-//         /* Decrement the column position by 16 */
-//         x += font->Width;
-//     }
-// }
 
 void Paint_DrawString_CN_From_File(UWORD Xstart, UWORD Ystart, String str, file_char *font, UWORD Color_Foreground, UWORD Color_Background)
 {
@@ -1194,27 +1115,7 @@ void Paint_DrawTime_From_File(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, fil
     Paint_DrawChar_From_File(Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', font, Color_Background, Color_Foreground);
     Paint_DrawChar_From_File(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime->Min / 10], font, Color_Background, Color_Foreground);
     Paint_DrawChar_From_File(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime->Min % 10], font, Color_Background, Color_Foreground);
-    
 }
-
-void Paint_DrawTime_From_File_HMS(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, file_char_acsll *font, UWORD Color_Foreground, UWORD Color_Background)
-{
-    uint8_t value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
-    UWORD Dx = font->Width;
-
-    // Write data into the cache
-    Paint_DrawChar_From_File(Xstart, Ystart, value[pTime->Hour / 10], font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx, Ystart, value[pTime->Hour % 10], font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx + Dx / 4 + Dx / 2, Ystart, ':', font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx * 2 + Dx / 2, Ystart, value[pTime->Min / 10], font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx * 3 + Dx / 2, Ystart, value[pTime->Min % 10], font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':', font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx * 5, Ystart, value[pTime->Sec / 10], font, Color_Background, Color_Foreground);
-    Paint_DrawChar_From_File(Xstart + Dx * 6, Ystart, value[pTime->Sec % 10], font, Color_Background, Color_Foreground);
-}
-
-
 
 void Paint_DrawIcon_From_File(int icon_code, UWORD xStart, UWORD yStart, UWORD W_Image, UWORD H_Image, UWORD Color_Foreground, UWORD Color_Background)
 {
@@ -1257,7 +1158,6 @@ void Paint_DrawIcon_From_File(int icon_code, UWORD xStart, UWORD yStart, UWORD W
     free(dataspace);
 }
 
-
 void verify_icon(const char *filename, uint8_t *dataspace, int index, UWORD xStart, UWORD yStart, UWORD W_Image, UWORD H_Image)
 {
     UWORD x, y;
@@ -1273,4 +1173,253 @@ void verify_icon(const char *filename, uint8_t *dataspace, int index, UWORD xSta
             Paint.Image[pAddr] = (unsigned char)dataspace[Addr];
         }
     }
+}
+
+/**
+ * @description: 从文件中读取汉字字符并绘制,到末尾则换行
+ * @param {UWORD} Xstart :
+ * @param {UWORD} Ystart :
+ * @param {String} str : 待绘制的字符串
+ * @param {file_char} *font : 字符集
+ * @param {UWORD} Color_Foreground :
+ * @param {UWORD} Color_Background :
+ * @return {Any}
+ */
+UWORD Paint_DrawString_CN_From_File_V2(UWORD Xstart, UWORD Ystart, String str, file_char *font, UWORD Color_Foreground, UWORD Color_Background)
+{
+    // const char *p_text = pString;
+    int x = Xstart, y = Ystart;
+    int i, j;
+    Serial.print("绘制汉字字符串: ");
+    Serial.println(str);
+    /* Send the string character by character on EPD */
+    int str_length = str.length();
+    if (str_length % 3 != 0)
+    {
+        Serial.println("字符串中包含非汉字字符");
+    }
+    String str_tmp;
+    for (int k = 0; k < str_length; k = k + 3)
+    {
+        if (x + font->Width > EPD_4IN2_WIDTH || y + font->Height > EPD_4IN2_HEIGHT)
+        {
+            // 无法绘制一个字符，则退出
+            break;
+        }
+        str_tmp = str.substring(k, k + 3);
+        int Char_Offset = index_cn(font->index_file, str_tmp.c_str());
+        if (Char_Offset < 0)
+        {
+            Serial.println("定位失败，找不到汉字：");
+            Serial.println(str_tmp);
+            require_char(str_tmp, font->index_file, font->data_file, font->font_size);
+        }
+        else
+        {
+            size_t len = font->Height * font->Width / 8;
+            Serial.printf("偏移量 = %d  长度 = %d \n", Char_Offset, len);
+
+            uint8_t dataspace[len];
+            read(font->data_file, dataspace, len, Char_Offset * len);
+
+            const unsigned char *ptr = dataspace; // 获得偏置值
+
+            ptr = dataspace;
+
+            for (j = 0; j < font->Height; j++)
+            {
+                for (i = 0; i < font->Width; i++)
+                {
+                    if (FONT_BACKGROUND == Color_Background)
+                    { // this process is to speed up the scan
+                        if (*ptr & (0x80 >> (i % 8)))
+                        {
+                            Paint_SetPixel(x + i, y + j, Color_Foreground);
+                            // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                        }
+                    }
+                    else
+                    {
+                        if (*ptr & (0x80 >> (i % 8)))
+                        {
+                            Paint_SetPixel(x + i, y + j, Color_Foreground);
+                            // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                        }
+                        else
+                        {
+                            Paint_SetPixel(x + i, y + j, Color_Background);
+                            // Paint_DrawPoint(x + i, y + j, Color_Background, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                        }
+                    }
+                    if (i % 8 == 7)
+                    {
+                        ptr++;
+                    }
+                }
+                if (font->Width % 8 != 0)
+                {
+                    ptr++;
+                }
+            }
+        }
+        // 移动到下一个位置
+        x += font->Width;
+        if (x + font->Width > EPD_4IN2_WIDTH)
+        {
+            // 超过最大宽度，向下移动一行
+            x = Xstart;
+            y = Ystart + font->Height;
+        }
+    }
+    // 返回下一行的h位置
+    // x返回到Xstart，则返回y，x不是Xstart，则y移动到下一行
+    return y + ((x - Xstart) == 0 ? 0 : font->Height);
+}
+
+int is_cn_char_start(unsigned char byte)
+{
+    // 判断字节是否是汉字的起始字节
+    return (byte & 0xE0) == 0xE0;
+}
+
+int is_cn_char(unsigned char byte)
+{
+    // 判断字节是否是汉字的起始字节
+    return (byte & 0xC0) == 0x80;
+}
+
+int is_en_char(unsigned char byte)
+{
+    return byte <= 0x7F;
+}
+
+/**
+ * @description: 绘制包含汉字和英文的字符串
+ * @param {UWORD} Xstart :
+ * @param {UWORD} Ystart :
+ * @param {String} str :
+ * @param {file_char} *font :
+ * @param {UWORD} Color_Foreground :
+ * @param {UWORD} Color_Background :
+ * @return {Any}
+ */
+UWORD Paint_DrawString_CN_From_File_V3(UWORD Xstart, UWORD Ystart, String str, file_char *cn_font, sFONT *en_font, UWORD Color_Foreground, UWORD Color_Background)
+{
+    // const char *p_text = pString;
+    int x = Xstart, y = Ystart;
+    int i, j;
+    Serial.print("绘制汉字字符串: ");
+    Serial.println(str);
+    int str_length = str.length();
+    int y_diff =(cn_font->Height  - en_font->Height)* 2 / 3;
+    if (str_length % 3 != 0)
+    {
+        Serial.println("字符串中包含非汉字字符");
+    }
+    String str_tmp;
+    for (int k = 0; k < str_length;)
+    {
+        if (x + cn_font->Width > EPD_4IN2_WIDTH || y + cn_font->Height > EPD_4IN2_HEIGHT)
+        {
+            break;
+        }
+
+        // 判断下一个字符的类型
+        if (is_en_char(str[k]))
+        {
+            // Paint_DrawString_EN(32, 12, WiFi.localIP().toString().c_str(), &Font12, BLACK, WHITE);
+            // Paint_DrawChar_From_File(x, y, str[k], en_font, Color_Background, Color_Foreground);
+            Paint_DrawChar(x, y + y_diff, str[k], en_font, Color_Foreground, Color_Background, -1);
+            k = k + 1;
+            // 移动到下一个位置
+            x += en_font->Width;
+            if (x + en_font->Width > EPD_4IN2_WIDTH)
+            {
+                // 超过最大宽度，向下移动一行
+                x = Xstart;
+                y = Ystart + en_font->Height;
+            }
+        }
+        else if (is_cn_char_start(str[k]) && is_cn_char(str[k + 1]) && is_cn_char(str[k + 2]))
+        {
+            str_tmp = str.substring(k, k + 3);
+            int Char_Offset = index_cn(cn_font->index_file, str_tmp.c_str());
+            if (Char_Offset < 0)
+            {
+                Serial.println("定位失败，找不到汉字：");
+                Serial.println(str_tmp);
+                require_char(str_tmp, cn_font->index_file, cn_font->data_file, cn_font->font_size);
+            }
+            else
+            {
+                size_t len = cn_font->Height * cn_font->Width / 8;
+                Serial.printf("偏移量 = %d  长度 = %d \n", Char_Offset, len);
+
+                uint8_t dataspace[len];
+                read(cn_font->data_file, dataspace, len, Char_Offset * len);
+
+                const unsigned char *ptr = dataspace; // 获得偏置值
+
+                ptr = dataspace;
+
+                for (j = 0; j < cn_font->Height; j++)
+                {
+                    for (i = 0; i < cn_font->Width; i++)
+                    {
+                        if (FONT_BACKGROUND == Color_Background)
+                        { // this process is to speed up the scan
+                            if (*ptr & (0x80 >> (i % 8)))
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Foreground);
+                                // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                            }
+                        }
+                        else
+                        {
+                            if (*ptr & (0x80 >> (i % 8)))
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Foreground);
+                                // Paint_DrawPoint(x + i, y + j, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                            }
+                            else
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Background);
+                                // Paint_DrawPoint(x + i, y + j, Color_Background, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                            }
+                        }
+                        if (i % 8 == 7)
+                        {
+                            ptr++;
+                        }
+                    }
+                    if (cn_font->Width % 8 != 0)
+                    {
+                        ptr++;
+                    }
+                }
+            }
+            k = k + 3;
+
+            // 移动到下一个位置
+            x += cn_font->Width;
+            if (x + cn_font->Width > EPD_4IN2_WIDTH)
+            {
+                // 超过最大宽度，向下移动一行
+                x = Xstart;
+                y = Ystart + cn_font->Height;
+            }
+        }
+
+        // // 移动到下一个位置
+        // x += cn_font->Width;
+        // if (x + cn_font->Width > EPD_4IN2_WIDTH)
+        // {
+        //     // 超过最大宽度，向下移动一行
+        //     x = Xstart;
+        //     y = Ystart + cn_font->Height;
+        // }
+    }
+    // 返回下一行的h位置
+    // x返回到Xstart，则返回y，x不是Xstart，则y移动到下一行
+    return y + ((x - Xstart) == 0 ? 0 : cn_font->Height);
 }
