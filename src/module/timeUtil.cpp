@@ -1,5 +1,7 @@
 
 #include "module/timeUtil.h"
+#include <TimeLib.h>
+
 
 // NTP Servers:
 static const char ntpServerName[] = "ntp.aliyun.com";

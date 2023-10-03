@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-10-02 17:17:34
- * @LastEditTime : 2023-10-02 20:22:44
+ * @LastEditTime : 2023-10-03 17:05:06
  * @Description  : 测试与手机的通信
  * @Tips         :
  */
@@ -20,7 +20,8 @@
 #include "module/motto.h"
 #include "resource/icon.h"
 #include "module/wificonfig.h"
-#include "server/webserver.h"
+#include "server/todo_server.h"
+// #include "server/webserver.h"
 
 UBYTE *BlackImage;
 
@@ -61,8 +62,7 @@ void update_time_task()
             Paint_DrawTime_From_File(120, time_x, &sPaint_time, &FXLED36, WHITE, BLACK);
             EPD_4IN2_PartialDisplay_step2(120, time_x, 120 + FXLED36.Width * 4.5, time_x + FXLED36.Height, BlackImage);
             old_min = sPaint_time.Min;
-            // EPD_4IN2_Init_Fast();
-            // EPD_4IN2_Display(BlackImage);
+
             EPD_4IN2_Sleep();
         }
     }
@@ -70,28 +70,13 @@ void update_time_task()
     {
         Serial.println("Failed to obtain time");
     }
-
-    // updataTime(sPaint_time);
-    // if (sPaint_time.Min != old_min)
-    // {
-    //     EPD_4IN2_Init_Partial();
-    //     EPD_4IN2_PartialDisplay_step1(120, time_x, 120 + FXLED36.Width * 4.5, time_x + FXLED36.Height, BlackImage);
-    //     Paint_ClearWindows(120, time_x, 120 + FXLED36.Width * 4.5, time_x + FXLED36.Height, WHITE);
-    //     Paint_DrawTime_From_File(120, time_x, &sPaint_time, &FXLED36, WHITE, BLACK);
-    //     EPD_4IN2_PartialDisplay_step2(120, time_x, 120 + FXLED36.Width * 4.5, time_x + FXLED36.Height, BlackImage);
-    //     old_min = sPaint_time.Min;
-    //     EPD_4IN2_Init_Fast();
-    //     EPD_4IN2_Display(BlackImage);
-    //     EPD_4IN2_Sleep();
-    // }
-    // Serial.println("update_time_task");
 }
 
 Task update_time(1000 * 1, TASK_FOREVER, &update_time_task);
 
 void setup()
 {
-    DEV_Module_Init(); // 文件系统、串口、SPI、GPIO初始化
+    DEV_Module_Init();         // 文件系统、串口、SPI、GPIO初始化
     BlackImage = init_paint(); // 创建图像缓冲区
     EPD_4IN2_Init_Fast();
     EPD_4IN2_Clear(); // 清屏
@@ -117,9 +102,11 @@ void setup()
     scheduler.addTask(update_time);
     update_time.enable();
 
-    // 开启网络服务器
+
     webserver.on("/uploadjson", HTTP_ANY, []()
-                 { handleTODO(webserver,doc); });
+                 { handleUpload(doc,webserver); });
+    webserver.on("/readall", HTTP_ANY, []()
+                 { handleReadAll(doc,webserver); });
     webserver.begin();
 }
 

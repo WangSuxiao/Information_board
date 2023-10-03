@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-04-25 19:03:03
- * @LastEditTime : 2023-09-30 15:28:55
+ * @LastEditTime : 2023-10-03 17:02:59
  * @Description  :  开机后网络连接
  *
  *                  1. 修改代码结构
@@ -52,11 +52,11 @@ int tryConnectFromFile(DynamicJsonDocument &doc, uint8_t *BlackImage)
     Paint_DrawString_CN_From_File(xstart, height * line, "尝试连接以下热点…", &PINGFANG12, BLACK, WHITE);
 
     WiFi.disconnect(true); // 禁用自动重连
-    WiFi.onStationModeDisconnected([&doc,&BlackImage](const WiFiEventStationModeDisconnected &event)
+    WiFi.onStationModeDisconnected([&doc, &BlackImage](const WiFiEventStationModeDisconnected &event)
                                    {
-                                    Serial.print("============准备重连=============");
-                                    // tryConnectFromFile(doc,BlackImage);
-                                    });
+                                       Serial.print("============准备重连=============");
+                                       // tryConnectFromFile(doc,BlackImage);
+                                   });
 
     line = (line + 2) % 10;
     for (size_t i = 0; i < doc.size(); i++)
@@ -384,14 +384,6 @@ void wifiConnect()
     Serial.println("WIFI Connect Success");
     Serial.println(WiFi.SSID());
 }
-
-
-
-
-
-
-
-
 
 // int tryConnectFromFile(DynamicJsonDocument &doc, uint8_t *BlackImage)
 // {
