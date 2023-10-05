@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-10-03 20:59:35
- * @LastEditTime : 2023-10-03 21:43:19
+ * @LastEditTime : 2023-10-05 20:14:37
  * @Description  : 用来测试Paint_DrawString_CN_From_File_V3函数效果
  * @Tips         :
  */
@@ -21,6 +21,7 @@
 #include "resource/icon.h"
 #include "module/wificonfig.h"
 #include "server/webserver.h"
+#include "module/todo.h"
 
 UBYTE *BlackImage;
 
@@ -154,13 +155,25 @@ void setup()
     EPD_4IN2_Init_Fast();
     EPD_4IN2_Clear(); // 清屏
     DEV_Delay_ms(500);
-
-    UWORD ystart = Paint_DrawString_CN_From_File_V2(52, 40, "一：是测试文字这是测试文字这是测试文字这是测试文字这是测试文字", &PINGFANG12, BLACK, WHITE);
-    ystart = Paint_DrawString_CN_From_File_V3(52, ystart, "二：是测试123文字这是测试文字这是测试文字这是测试文字这是测试文字", &PINGFANG12,&Font20, BLACK, WHITE);
-    ystart = Paint_DrawString_CN_From_File_V3(52, ystart, "三：是测试abc文字这是测试cfsdg文字这是测试文字这是测试文字这是测试文字", &PINGFANG12,&Font24, BLACK, WHITE);
-
-    EPD_4IN2_Display(BlackImage);
     EPD_4IN2_Sleep();
+
+    // UWORD ystart = Paint_DrawString_CN_From_File_V2(52, 40, "一：是测试文字这是测试文字这是测试文字这是测试文字这是测试文字", &PINGFANG12, BLACK, WHITE);
+    // ystart = Paint_DrawString_CN_From_File_V3(52, ystart, "二：是测试123文字这是测试文字这是测试文字这是测试文字这是测试文字", &PINGFANG12,&Font20, BLACK, WHITE);
+    // ystart = Paint_DrawString_CN_From_File_V3(52, ystart, "三：是测试abc文字这是测试cfsdg文字这是测试文字这是测试文字这是测试文字", &PINGFANG12,&Font24, BLACK, WHITE);
+    int index = 0;
+    int sum = 25;
+    while (index < sum)
+    {
+        EPD_4IN2_Init_Fast();
+        Paint_Clear(WHITE);
+        // Paint_ClearWindows(DRAW_TODO_X_START,DRAW_TODO_Y_START,DRAW_TODO_X_END,DRAW_TODO_Y_END,WHITE);
+        index = draw_TODO_onepage(DRAW_TODO_Y_START - index * 2, sum, index, &PINGFANG12, &Font24);
+        // Serial.print("index : ");
+        // Serial.println(index);
+        EPD_4IN2_Display(BlackImage);
+        EPD_4IN2_Sleep();
+        delay(10*1000);
+    }
 }
 
 void loop()

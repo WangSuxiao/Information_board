@@ -149,7 +149,7 @@ void Paint_DrawString_EN_From_File(UWORD Xstart, UWORD Ystart, const char *pStri
 void Paint_DrawString_CN_From_File(UWORD Xstart, UWORD Ystart, String str, file_char *font,UWORD Color_Foreground, UWORD Color_Background);
 UWORD Paint_DrawString_CN_From_File_V2(UWORD Xstart, UWORD Ystart, String str, file_char *font, UWORD Color_Foreground, UWORD Color_Background);
 UWORD Paint_DrawString_CN_From_File_V3(UWORD Xstart, UWORD Ystart, String str, file_char *cn_font, sFONT *en_font, UWORD Color_Foreground, UWORD Color_Background);
-
+UWORD Paint_DrawString_CN_From_File_V4(UWORD Xstart, UWORD Xend, UWORD Ystart,UWORD Yend, String str, file_char *cn_font, sFONT *en_font, UWORD Color_Foreground, UWORD Color_Background);
 void Paint_DrawNum_From_File(UWORD Xpoint, UWORD Ypoint, int32_t Nummber, file_char_acsll *font, UWORD Color_Foreground, UWORD Color_Background);
 void verify_icon(const char *filename, uint8_t *dataspace, int index, UWORD xStart, UWORD yStart, UWORD W_Image, UWORD H_Image);
 // void Paint_DrawIcon_From_File(const char *filename, int index, UWORD xStart, UWORD yStart, UWORD W_Image, UWORD H_Image, UWORD Color_Foreground,UWORD Color_Background);
