@@ -112,7 +112,7 @@ int index_cn(const char *file_name, const char *p_text)
     // 打开文件
     if (LittleFS.exists(file_name))
     {
-        Serial.printf("%s FOUND.\n", file_name);
+        // Serial.printf("%s FOUND.\n", file_name);
     }
     else
     {
@@ -128,7 +128,7 @@ int index_cn(const char *file_name, const char *p_text)
     }
     else
     {
-        Serial.println("open index file SUCCESS.\n");
+        // Serial.println("open index file SUCCESS.\n");
     }
 
     fp.seek(0, SeekEnd);
@@ -138,8 +138,8 @@ int index_cn(const char *file_name, const char *p_text)
     int bufferlen = 3 * 50;
     int epoch = (filelen + bufferlen - 1) / bufferlen;
     unsigned char *buffer = (unsigned char *)malloc(bufferlen);
-    Serial.println("Free heap space: " + String(ESP.getFreeHeap()) + " bytes");
-    Serial.println("batch: " + String(bufferlen) + "epoch: " + String(epoch));
+    // Serial.println("Free heap space: " + String(ESP.getFreeHeap()) + " bytes");
+    // Serial.println("batch: " + String(bufferlen) + "epoch: " + String(epoch));
     int pointer = 0;
     int counter = 0;
     for (int _epoch = 0; _epoch < epoch; _epoch++)
@@ -182,7 +182,7 @@ int index_cn(const char *file_name, const char *p_text)
         if (index != -1)
         {
             index = (index + _epoch * bufferlen) / 3;
-            Serial.printf("The character is found at position %d in the file.", index);
+            // Serial.printf("The character is found at position %d in the file.", index);
             break;
         }
 
