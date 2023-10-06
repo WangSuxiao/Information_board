@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-09-28 15:59:22
- * @LastEditTime : 2023-10-05 20:20:17
+ * @LastEditTime : 2023-10-05 22:26:23
  * @Description  : 绘制TODO
  * @Tips         :
  */
@@ -30,7 +30,7 @@ UWORD draw_TODO_onepage(int y_start, int item_sum, int current_item, file_char *
     for (int index = current_item; index < item_sum; index++)
     {
         String target_str = "一二三四五01234六七八九十56789一二三四五01234六七八九十567890123456789";
-        draw_result = Paint_DrawString_CN_From_File_V4(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y, EPD_4IN2_HEIGHT, target_str, &PINGFANG12, &Font24, BLACK, WHITE);
+        draw_result = Paint_DrawString_CN_From_File_V5(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y, EPD_4IN2_HEIGHT, target_str, &PINGFANG12, &Font24, BLACK, WHITE);
         use_line = (draw_result / 1000);
         next_y = next_y + use_line * ((PINGFANG12.Height > Font24.Height) ? PINGFANG12.Height : Font24.Height);
         next_str = draw_result % 1000;

@@ -1440,13 +1440,13 @@ UWORD Paint_DrawString_CN_From_File_V3(UWORD Xstart, UWORD Ystart, String str, f
 UWORD Paint_DrawString_CN_From_File_V4(UWORD Xstart, UWORD Xend, UWORD Ystart, UWORD Yend, String str, file_char *cn_font, sFONT *en_font, UWORD Color_Foreground, UWORD Color_Background)
 {
     int font_max_height = cn_font->Height > en_font->Height ? cn_font->Height : en_font->Height;
-    int font_max_width = cn_font->Width > en_font->Width ? cn_font->Width : en_font->Width;
+    // int font_max_width = cn_font->Width > en_font->Width ? cn_font->Width : en_font->Width;
     int y_diff = (cn_font->Height - en_font->Height) * 2 / 3; // 英文比汉字高，则为负值，英文绘制时y提升
-    int x = Xstart, y = Ystart;     // 各个字符绘制的位置
-    int i;          // 用于遍历字符各行的各个像素【一个字节八个像素】
-    int j;          // 用于遍历字符各行
-    int k = 0;      // 用于遍历str_length个字节
-    int line = 0;   // 存储换行的次数
+    int x = Xstart, y = Ystart;                               // 各个字符绘制的位置
+    int i;                                                    // 用于遍历字符各行的各个像素【一个字节八个像素】
+    int j;                                                    // 用于遍历字符各行
+    int k = 0;                                                // 用于遍历str_length个字节
+    int line = 0;                                             // 存储换行的次数
     String str_tmp;
     // Serial.print("绘制汉字字符串: ");
     // Serial.println(str);
@@ -1455,15 +1455,13 @@ UWORD Paint_DrawString_CN_From_File_V4(UWORD Xstart, UWORD Xend, UWORD Ystart, U
     // int offset = 1000;
     while (k < str_length)
     {
-        if (x + cn_font->Width > EPD_4IN2_WIDTH || y + cn_font->Height > EPD_4IN2_HEIGHT)
-        {
-            // offset = 0;
-            break;
-        }
-
         // 判断下一个字符的类型
         if (is_en_char(str[k]))
         {
+            if (x + en_font->Width > EPD_4IN2_WIDTH || y + font_max_height > EPD_4IN2_HEIGHT)
+            {
+                break;
+            }
             Paint_DrawChar(x, y + y_diff, str[k], en_font, Color_Foreground, Color_Background, -1);
             k = k + 1;
             // 移动到下一个位置
@@ -1478,6 +1476,11 @@ UWORD Paint_DrawString_CN_From_File_V4(UWORD Xstart, UWORD Xend, UWORD Ystart, U
         }
         else if (is_cn_char_start(str[k]) && is_cn_char(str[k + 1]) && is_cn_char(str[k + 2]))
         {
+            if (x + cn_font->Width > EPD_4IN2_WIDTH || y + font_max_height > EPD_4IN2_HEIGHT)
+            {
+                // offset = 0;
+                break;
+            }
             str_tmp = str.substring(k, k + 3);
             int Char_Offset = index_cn(cn_font->index_file, str_tmp.c_str());
             if (Char_Offset < 0)
@@ -1550,12 +1553,202 @@ UWORD Paint_DrawString_CN_From_File_V4(UWORD Xstart, UWORD Xend, UWORD Ystart, U
 
     // 判断x是否回到开头，如果不是回到开头，已经占用的行数 = 换行次数 + 1
     // 返回值 = 已经绘制的字节数  +  已经占用的行数 * 10000
-    if((x - Xstart)!= 0 ){
+    if ((x - Xstart) != 0)
+    {
 
         line = line + 1;
-    }else{
+    }
+    else
+    {
         Serial.println("换行但是没有使用");
     }
+    return k + line * 1000;
+    // return k + ((x - Xstart) == 0 ? line : line + 1) * 1000;
+}
+
+/**
+ * @description:
+ *          ===============================================================
+ *          【V5版本】
+ *          优化了：每个汉字都会重新打开索引和字模文件造成的资源浪费，以及定位汉字
+ *                 时，频繁申请内存空间。
+ *          ===============================================================
+ *          【V4版本】
+ *          完善V3的功能：添加Xend控制换行位置
+ *          修改返回值规则：返回值 = 已经绘制的字节数  +  已经占用的行数 * 1000
+ *          ===============================================================
+ * @param {UWORD} Xstart :ccccc
+ * @param {UWORD} Ystart :
+ * @param {String} str :
+ * @param {file_char} *font :
+ * @param {UWORD} Color_Foreground :
+ * @param {UWORD} Color_Background :
+ * @return {UWORD} 已经绘制的字节数  +  已经占用的行数 * 1000
+ */
+UWORD Paint_DrawString_CN_From_File_V5(UWORD Xstart, UWORD Xend, UWORD Ystart, UWORD Yend, String str, file_char *cn_font, sFONT *en_font, UWORD Color_Foreground, UWORD Color_Background)
+{
+    int font_max_height = cn_font->Height > en_font->Height ? cn_font->Height : en_font->Height;
+    // int font_max_width = cn_font->Width > en_font->Width ? cn_font->Width : en_font->Width;
+    int y_diff = (cn_font->Height - en_font->Height) * 2 / 3; // 英文比汉字高，则为负值，英文绘制时y提升
+    int x = Xstart, y = Ystart;                               // 各个字符绘制的位置
+    int i;                                                    // 用于遍历字符各行的各个像素【一个字节八个像素】
+    int j;                                                    // 用于遍历字符各行
+    int k = 0;                                                // 用于遍历str_length个字节
+    int line = 0;                                             // 存储换行的次数
+    String str_tmp;                                           // 指向当前要处理的字符
+    int str_length = str.length();                            // 待绘制字符串总长度
+
+    // 索引文件和字模文件的初始化
+    File fp;  // 汉字索引文件句柄
+    int flen; // 索引文件长度
+    File datafp;
+    if (LittleFS.exists(cn_font->index_file))
+    {
+        Serial.printf("定位汉字索引文件%s成功.\n", cn_font->index_file);
+        fp = LittleFS.open(cn_font->index_file, "r");
+        if (!fp)
+        {
+            Serial.println("索引文件打开失败.\n");
+            return 0;
+        }
+        else
+        {
+            fp.seek(0, SeekEnd);
+            flen = fp.position();
+        }
+    }
+    else
+    {
+        Serial.printf("绘制长字符串，定位索引文件%s失败.\n", cn_font->index_file);
+        return 0;
+    }
+    if (LittleFS.exists(cn_font->data_file))
+    {
+        datafp = LittleFS.open(cn_font->data_file, "r");
+        if (!datafp)
+        {
+            Serial.println("数据文件打开失败.\n");
+            return 0;
+        }
+    }
+    else
+    {
+        Serial.printf("数据文件%s不存在.\n", cn_font->data_file);
+        return 0;
+    }
+    // 索引文件处理时使用的变量
+    int charIndex;             // 返回的汉字索引
+    int indexBufferLen = 3 * 50; // 定位汉字使用的缓冲区
+    unsigned char *indexBuffer = (unsigned char *)malloc(indexBufferLen);
+    // 数据文件处理时使用的变量
+    size_t charLen = cn_font->Height * cn_font->Width / 8;
+    uint8_t charBuffer[charLen];           // 汉字缓冲区
+    const unsigned char *ptr = charBuffer; // 用于遍历汉字字模各字节
+    while (k < str_length)
+    {
+        // 判断下一个字符的类型
+        if (is_en_char(str[k]))
+        {
+            if (x + en_font->Width > Xend || y + font_max_height > Yend)
+            {
+                break;
+            }
+            Paint_DrawChar(x, y + y_diff, str[k], en_font, Color_Foreground, Color_Background, -1);
+            k = k + 1;
+            // 移动到下一个位置
+            x += en_font->Width;
+            if (x + en_font->Width > Xend)
+            {
+                // 超过最大宽度，向下移动一行
+                x = Xstart;
+                y = y + font_max_height;
+                line = line + 1;
+            }
+        }
+        else if (is_cn_char_start(str[k]) && is_cn_char(str[k + 1]) && is_cn_char(str[k + 2]))
+        {
+            if (x + cn_font->Width > Xend || y + font_max_height > EPD_4IN2_HEIGHT)
+            {
+                break;
+            }
+            str_tmp = str.substring(k, k + 3);
+            charIndex = index_cn_v2(fp, flen, str_tmp.c_str(), indexBufferLen, indexBuffer);
+            Serial.print("index_cn_v2 : ");
+            Serial.println(charIndex);
+            if (charIndex < 0)
+            {
+                Serial.println("定位失败，找不到汉字：");
+                Serial.println(str_tmp);
+                require_char(str_tmp, cn_font->index_file, cn_font->data_file, cn_font->font_size);
+            }
+            else
+            {
+                // Serial.printf("偏移量 = %d  长度 = %d \n", charIndex, charLen);
+                // Serial.println("Free heap space: " + String(ESP.getFreeHeap()) + " bytes");
+
+                datafp.seek(charIndex* charLen, SeekSet);
+                int len_tmp = datafp.read(charBuffer, charLen);
+
+                ptr = charBuffer;
+                for (j = 0; j < cn_font->Height; j++)
+                {
+                    for (i = 0; i < cn_font->Width; i++)
+                    {
+                        if (FONT_BACKGROUND == Color_Background)
+                        {
+                            if (*ptr & (0x80 >> (i % 8)))
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Foreground);
+                            }
+                        }
+                        else
+                        {
+                            if (*ptr & (0x80 >> (i % 8)))
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Foreground);
+                            }
+                            else
+                            {
+                                Paint_SetPixel(x + i, y + j, Color_Background);
+                            }
+                        }
+                        if (i % 8 == 7)
+                        {
+                            ptr++;
+                        }
+                    }
+                    if (cn_font->Width % 8 != 0)
+                    {
+                        ptr++;
+                    }
+                }
+            }
+            k = k + 3;
+
+            // 移动到下一个位置
+            x += cn_font->Width;
+            if (x + cn_font->Width > Xend)
+            {
+                // 超过最大宽度，向下移动一行
+                x = Xstart;
+                y = y + font_max_height;
+                line = line + 1;
+            }
+        }
+    }
+
+    if ((x - Xstart) != 0)
+    {
+        // 判断x是否回到开头，如果不是回到开头，已经占用的行数 = 换行次数 + 1
+        line = line + 1;
+    }
+    else
+    {
+        Serial.println("换行但是没有使用");
+    }
+    fp.close();
+    free(indexBuffer);
+    // 返回值 = 已经绘制的字节数  +  已经占用的行数 * 10000
     return k + line * 1000;
     // return k + ((x - Xstart) == 0 ? line : line + 1) * 1000;
 }

@@ -162,6 +162,7 @@ void setup()
     // ystart = Paint_DrawString_CN_From_File_V3(52, ystart, "三：是测试abc文字这是测试cfsdg文字这是测试文字这是测试文字这是测试文字", &PINGFANG12,&Font24, BLACK, WHITE);
     int index = 0;
     int sum = 25;
+    Serial.println("===================Start=======================");
     while (index < sum)
     {
         EPD_4IN2_Init_Fast();

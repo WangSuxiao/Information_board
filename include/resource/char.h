@@ -38,4 +38,6 @@ int index_cn(const char *file_name, const char *p_text);
 bool append(const char *index_filename, const char *data_filename, uint8_t *cn_char, uint8_t *data_space, size_t length);
 
 void require_char(const String &value, const char *index_filename, const char *data_filename, int font_size);
+
+int index_cn_v2(File fp, int filelen, const char *p_text, int bufferlen, unsigned char *buffer);
 #endif

@@ -1,6 +1,5 @@
 #include "resource/char.h"
 
-
 String serverUrl = "http://www.wangsuxiao.com";
 String resource = "/addchar?ch=";
 
@@ -117,6 +116,7 @@ int index_cn(const char *file_name, const char *p_text)
     else
     {
         Serial.printf("%s NOT FOUND.\n", file_name);
+        return index;
     }
 
     File fp = LittleFS.open(file_name, "r");
@@ -162,7 +162,6 @@ int index_cn(const char *file_name, const char *p_text)
                     {
                         index = pointer;
                         break;
-
                     }
                 }
                 else
@@ -185,7 +184,6 @@ int index_cn(const char *file_name, const char *p_text)
             // Serial.printf("The character is found at position %d in the file.", index);
             break;
         }
-
     }
 
     fp.close();
@@ -194,6 +192,58 @@ int index_cn(const char *file_name, const char *p_text)
 }
 
 
+
+int index_cn_v2(File fp, int filelen, const char *p_text, int bufferlen, unsigned char *buffer)
+{
+    fp.seek(0);
+    int epoch = (filelen + bufferlen - 1) / bufferlen;
+    int index = -1;
+    int pointer = 0;
+    int counter = 0;
+    for (int _epoch = 0; _epoch < epoch; _epoch++)
+    {
+        index = -1;
+        fp.read(buffer, bufferlen);
+        for (pointer = 0; pointer < bufferlen; pointer++)
+        {
+            counter = 1;
+            if (is_chinese_character_start(buffer[pointer]))
+            {
+                counter = 1;
+                while ((buffer[pointer + counter] & 0xC0) == 0x80)
+                {
+                    counter++;
+                }
+                if (counter == 3)
+                {
+                    if (buffer[pointer] == *p_text && buffer[pointer + 1] == *(p_text + 1) && buffer[pointer + 2] == *(p_text + 2))
+                    {
+                        index = pointer;
+                        break;
+                    }
+                }
+                else
+                {
+                    Serial.println("ERROR : 汉字编码长度不是3");
+                }
+                pointer += counter - 1;
+            }
+            else
+            {
+                Serial.print("ERROR : 第一个字符不是汉字字符");
+                Serial.println(pointer);
+                Serial.println(" ");
+                Serial.println(_epoch);
+            }
+        }
+        if (index != -1)
+        {
+            index = (index + _epoch * bufferlen) / 3;
+            break;
+        }
+    }
+    return index;
+}
 
 String urlEncode(const String &value)
 {
@@ -227,7 +277,7 @@ String urlEncode(const String &value)
  * @param {int} font_size : 字号
  * @return {Any}
  */
-void require_char(const String &value,const char *index_filename, const char *data_filename,int font_size)
+void require_char(const String &value, const char *index_filename, const char *data_filename, int font_size)
 {
 
     WiFiClient client;
@@ -255,7 +305,7 @@ void require_char(const String &value,const char *index_filename, const char *da
         Serial.print("value : ");
         Serial.println(value);
         Serial.println(value.length());
-        Serial.println(value.substring(0,3));
+        Serial.println(value.substring(0, 3));
 
         // Process the response data
         int ch_size = (response.length() + 1) / 5;
@@ -277,7 +327,7 @@ void require_char(const String &value,const char *index_filename, const char *da
         unsigned char lastvalue = (unsigned char)strtol(hexValue.c_str(), NULL, 16);
         dataArray[dataIndex] = lastvalue;
         Serial.print("请求字模");
-        Serial.print(value.substring(0,3));
+        Serial.print(value.substring(0, 3));
         for (int i = 0; i < ch_size; i++)
         {
             Serial.print("dataArray[");
@@ -287,7 +337,7 @@ void require_char(const String &value,const char *index_filename, const char *da
             Serial.print(" ");
         }
 
-        append(index_filename, data_filename,(uint8_t *)(value.substring(0,3).c_str()),dataArray,ch_size);
+        append(index_filename, data_filename, (uint8_t *)(value.substring(0, 3).c_str()), dataArray, ch_size);
         // for (int i = 0; i < ch_size; i++)
         // {
         //     Serial.print("dataArray[");
