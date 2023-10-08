@@ -17,4 +17,7 @@
 #define DRAW_TODO_Y_END 300
 
 UWORD draw_TODO_onepage(int y_start, int item_sum, int current_item, file_char *cn_font, sFONT *en_font);
+
+int getTODOQuantity();
+UWORD drawTODO_OnePage(file_char *cn_font, sFONT *en_font, int start);
 #endif

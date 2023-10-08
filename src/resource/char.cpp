@@ -224,7 +224,7 @@ int index_cn_v2(File fp, int filelen, const char *p_text, int bufferlen, unsigne
                 }
                 else
                 {
-                    Serial.println("ERROR : 汉字编码长度不是3");
+                    // Serial.println("ERROR : 汉字编码长度不是3");
                 }
                 pointer += counter - 1;
             }

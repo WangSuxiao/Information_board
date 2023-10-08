@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-10-03 15:00:43
- * @LastEditTime : 2023-10-03 17:03:32
+ * @LastEditTime : 2023-10-07 16:16:55
  * @Description  :
  * @Tips         :
  */
@@ -57,6 +57,21 @@ bool insertTodoToFile(const Todo &todo)
         {
             // 格式化数据并写入文件，用制表符分隔字段
             String data = String(todo.id) + "\t" + todo.start + "\t" + todo.end + "\t" + String(todo.level) + "\t" + todo.info;
+
+            Serial.print("存储信息：");
+            Serial.print("String(todo.id) : ");
+            Serial.println(String(todo.id).length());
+            Serial.print("todo.start : ");
+            Serial.println(todo.start.length());
+            Serial.print("todo.end : ");
+            Serial.println(todo.end.length());
+            Serial.print("String(todo.level) : ");
+            Serial.println(String(todo.level).length());
+            Serial.print("todo.info : ");
+            Serial.println(todo.info.length());
+            Serial.print("整体长度 ：");
+            Serial.println(data.length());
+
             file.println(data);
             file.close();
             return true;
@@ -261,7 +276,7 @@ void handleReadAll(DynamicJsonDocument &doc, ESP8266WebServer &server)
         counter++;
     }
     file.close();
-    
+
     doc["code"] = 200;
     doc["counter"] = todos.size();
 

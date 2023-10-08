@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-09-28 15:59:22
- * @LastEditTime : 2023-10-06 21:39:46
+ * @LastEditTime : 2023-10-07 21:27:32
  * @Description  : 绘制TODO
  * @Tips         :
  */
@@ -80,21 +80,22 @@ int getTODOQuantity()
 /**
  * @description:
  * @param {int} start : 本次绘制的起始index
- * @return {UWORD} 
+ * @return {UWORD}
  *      下一个要绘制的todo的index
  *      -1 ：文件处理失败
- *      < start : 条目数量不对 
+ *      < start : 条目数量不对
  */
-UWORD drawTODO(file_char *cn_font, sFONT *en_font, int start)
+UWORD drawTODO_OnePage(file_char *cn_font, sFONT *en_font, int start)
 {
+    Serial.println("drawTODO_OnePage : ");
     // 1. 读取配置文件
     File file = LittleFS.open(TODO_FILE, "r");
-    int end = start;            // 存储返回值
-    int currentLine = -1;
+    int nextLine = -1;
+    // int ltIndex = -1;              // line中的\t的index
     if (file)
     {
         String line;
-        currentLine = -1;
+        nextLine = 0;                     // 下一个要绘制的todo条目
         UWORD next_char = 0;              // 已经绘制的字节数
         UWORD use_line = 0;               // 已经绘制的字节数
         UWORD next_y = DRAW_TODO_Y_START; // 指向下一个开始行
@@ -102,45 +103,97 @@ UWORD drawTODO(file_char *cn_font, sFONT *en_font, int start)
         while (file.available())
         {
             line = file.readStringUntil('\n');
-            currentLine = currentLine + 1;
-            if (currentLine < start)
+            nextLine = nextLine + 1;
+            if (nextLine <= start)
             {
+                // nextLine指向下一次要绘制的条目索引
+                // 如果和下一次和开始的索引相同
+                // 那么本次也应该跳过，即不绘制
                 continue;
             }
-            Todo todo;
-            todo.id = line.substring(0, line.indexOf('\t')).toInt();
-            line = line.substring(line.indexOf('\t') + 1);
-            todo.start = line.substring(0, line.indexOf('\t'));
-            line = line.substring(line.indexOf('\t') + 1);
-            todo.end = line.substring(0, line.indexOf('\t'));
-            line = line.substring(line.indexOf('\t') + 1);
-            todo.level = line.substring(0, line.indexOf('\t')).toInt();
-            todo.info = line.substring(line.indexOf('\t') + 1);
+            // 分隔
+            // ltIndex = -1;       // 可以省略，
+            // while (true)
+            // {
+            //     ltIndex = line.indexOf("\t", ltIndex + 1);
+            //     if (ltIndex == -1)
+            //     {
+            //         break;
+            //     }
+            //     Serial.println(String(ltIndex));
+            // }
 
-            Serial.println(line);
+            int ltIndex_1 = -1;
+            int ltIndex_2 = -1;
+            Todo todo;
+
+            ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
+            // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
+            todo.id = line.substring(ltIndex_1 + 1, ltIndex_2).toInt();
+            ltIndex_1 = ltIndex_2;
+
+            ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
+            // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
+            todo.start = line.substring(ltIndex_1 + 1, ltIndex_2);
+            ltIndex_1 = ltIndex_2;
+
+            ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
+            // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
+            todo.end = line.substring(ltIndex_1 + 1, ltIndex_2);
+            ltIndex_1 = ltIndex_2;
+
+            ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
+            todo.level = line.substring(ltIndex_1 + 1, ltIndex_2).toInt();
+            ltIndex_1 = ltIndex_2;
+
+            ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
+            // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
+            todo.info = line.substring(ltIndex_1 + 1, ltIndex_2);
+            ltIndex_1 = ltIndex_2;
+
+            Serial.println("=======================================");
+            Serial.println(todo.id * 100 + todo.level);
+            Serial.println(todo.start);
+            Serial.println(todo.end);
+            Serial.println(todo.info);
+            Serial.println("=======================================");
+            // Todo todo;
+            // todo.id = line.substring(0, line.indexOf('\t',ltIndex)).toInt();
+            // line = line.substring(line.indexOf('\t') + 1);
+            // todo.start = line.substring(0, line.indexOf('\t'));
+            // line = line.substring(line.indexOf('\t') + 1);
+            // todo.end = line.substring(0, line.indexOf('\t'));
+            // line = line.substring(line.indexOf('\t') + 1);
+            // todo.level = line.substring(0, line.indexOf('\t')).toInt();
+            // todo.info = line.substring(line.indexOf('\t') + 1);
+
+            // Serial.print("本条读取的数据 : ");
+            // Serial.println(line);
 
             String target_str = line;
+            target_str.trim();
+            target_str.replace("\t", " ");
             draw_result = Paint_DrawString_CN_From_File_V5(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y, EPD_4IN2_HEIGHT, target_str, &PINGFANG12, &Font24, BLACK, WHITE);
             use_line = (draw_result / 1000);
             next_y = next_y + use_line * ((PINGFANG12.Height > Font24.Height) ? PINGFANG12.Height : Font24.Height);
             next_char = draw_result % 1000;
 
-            Serial.print("字符串长度 ： ");
-            Serial.println(target_str.length());
-            Serial.println("已使用行数 : ");
-            Serial.println(use_line);
-            Serial.println("已绘制长度 : ");
-            Serial.println(next_char);
-            Serial.println(draw_result);
-            Serial.print("下次绘制位置 ： ");
-            Serial.println(next_y);
+            // Serial.print("字符串长度 ： ");
+            // Serial.println(target_str.length());
+            // Serial.println("已使用行数 : ");
+            // Serial.println(use_line);
+            // Serial.println("已绘制长度 : ");
+            // Serial.println(next_char);
+            // Serial.println(draw_result);
+            // Serial.print("下次绘制位置 ： ");
+            // Serial.println(next_y);
 
             if (next_y + (cn_font->Height > en_font->Height ? cn_font->Height : en_font->Height) > EPD_4IN2_HEIGHT)
             {
                 // 没有剩余空间,结束绘制，返回下一个要绘制的条目索引
                 // 如果本条绘制完成，指向下一个索引
                 // 如果本条没有绘制完成，仍指向本条目
-                currentLine = (next_char == target_str.length()) ? currentLine + 1 : currentLine;
+                nextLine = (next_char == target_str.length()) ? nextLine : nextLine - 1;
                 break;
             }
         }
@@ -150,7 +203,7 @@ UWORD drawTODO(file_char *cn_font, sFONT *en_font, int start)
         Serial.println("Failed to open file for reading.");
     }
     file.close();
-    return currentLine;
+    return nextLine;
     // 2. 绘制
 
     // int item_sum;
@@ -197,3 +250,21 @@ UWORD drawTODO(file_char *cn_font, sFONT *en_font, int start)
     // }
     // return return_index;
 }
+
+// int sum = getTODOQuantity();
+//     Serial.println("条目总和:");
+//     Serial.println(sum);
+//     UWORD index = 0;
+//     while (index < sum)
+//     {
+//         EPD_4IN2_Init_Fast();
+//         Serial.println("开始的索引 :");
+//         Paint_Clear(WHITE);
+//         Serial.println(index);
+//         index = drawTODO_OnePage(&PINGFANG12, &Font24, index);
+//         EPD_4IN2_Display(BlackImage);
+//         Serial.println("下一次的索引 :");
+//         Serial.println(index);
+//         EPD_4IN2_Sleep();
+//         delay(10 * 1000);
+//     }

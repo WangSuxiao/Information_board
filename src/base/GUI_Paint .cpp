@@ -1604,7 +1604,7 @@ UWORD Paint_DrawString_CN_From_File_V5(UWORD Xstart, UWORD Xend, UWORD Ystart, U
     File datafp;
     if (LittleFS.exists(cn_font->index_file))
     {
-        Serial.printf("定位汉字索引文件%s成功.\n", cn_font->index_file);
+        // Serial.printf("定位汉字索引文件%s成功.\n", cn_font->index_file);
         fp = LittleFS.open(cn_font->index_file, "r");
         if (!fp)
         {
@@ -1673,8 +1673,8 @@ UWORD Paint_DrawString_CN_From_File_V5(UWORD Xstart, UWORD Xend, UWORD Ystart, U
             }
             str_tmp = str.substring(k, k + 3);
             charIndex = index_cn_v2(fp, flen, str_tmp.c_str(), indexBufferLen, indexBuffer);
-            Serial.print("index_cn_v2 : ");
-            Serial.println(charIndex);
+            // Serial.print("index_cn_v2 : ");
+            // Serial.println(charIndex);
             if (charIndex < 0)
             {
                 Serial.println("定位失败，找不到汉字：");
@@ -1744,7 +1744,7 @@ UWORD Paint_DrawString_CN_From_File_V5(UWORD Xstart, UWORD Xend, UWORD Ystart, U
     }
     else
     {
-        Serial.println("换行但是没有使用");
+        // Serial.println("换行但是没有使用");
     }
     fp.close();
     free(indexBuffer);
