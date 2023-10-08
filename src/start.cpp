@@ -152,7 +152,8 @@ void drawTODO()
         Paint_ClearWindows(DRAW_TODO_X_START,DRAW_TODO_Y_START,DRAW_TODO_X_END,DRAW_TODO_Y_END,WHITE);
         Serial.print("开始的索引 :");
         Serial.println(todo_index);
-        todo_index = drawTODO_OnePage(&PINGFANG12, &Font24, todo_index);
+        // todo_index = drawTODO_OnePage(&PINGFANG12, &Font24, todo_index);
+        todo_index = drawTODO_OnePage_V2(&Font16,&PINGFANG12, &Font20, todo_index, -1);
         EPD_4IN2_Display(BlackImage);
         Serial.print("下一次的索引 :");
         Serial.println(todo_index);
