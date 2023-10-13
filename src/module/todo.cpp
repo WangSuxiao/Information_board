@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-09-28 15:59:22
- * @LastEditTime : 2023-10-08 14:06:28
+ * @LastEditTime : 2023-10-10 22:19:37
  * @Description  : 绘制TODO
  * @Tips         :
  */
@@ -135,12 +135,14 @@ UWORD drawTODO_OnePage(file_char *cn_font, sFONT *en_font, int start)
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
             // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
-            todo.start = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.start = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
             // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
-            todo.end = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.end = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
@@ -149,14 +151,15 @@ UWORD drawTODO_OnePage(file_char *cn_font, sFONT *en_font, int start)
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
             // Serial.println(line.substring(ltIndex_1 + 1, ltIndex_2));
-            todo.info = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.info = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             Serial.println("=======================================");
             Serial.println(todo.id * 100 + todo.level);
             Serial.println(todo.start);
             Serial.println(todo.end);
-            Serial.println(todo.info);
+            // Serial.println(todo.info);
             Serial.println("=======================================");
             // Todo todo;
             // todo.id = line.substring(0, line.indexOf('\t',ltIndex)).toInt();
@@ -300,17 +303,20 @@ UWORD drawTODO_OnePage_V2(sFONT *time_font, file_char *cn_font, sFONT *en_font, 
             int ltIndex_1 = -1;
             int ltIndex_2 = -1;
             Todo todo;
+            String info;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
             todo.id = line.substring(ltIndex_1 + 1, ltIndex_2).toInt();
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
-            todo.start = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.start = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
-            todo.end = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.end = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
@@ -318,14 +324,15 @@ UWORD drawTODO_OnePage_V2(sFONT *time_font, file_char *cn_font, sFONT *en_font, 
             ltIndex_1 = ltIndex_2;
 
             ltIndex_2 = line.indexOf('\t', ltIndex_1 + 1);
-            todo.info = line.substring(ltIndex_1 + 1, ltIndex_2);
+            // todo.info = line.substring(ltIndex_1 + 1, ltIndex_2);
+            line.substring(ltIndex_1 + 1, ltIndex_2);
             ltIndex_1 = ltIndex_2;
 
             Serial.println("=======================================");
             Serial.println(todo.id * 100 + todo.level);
             Serial.println(todo.start);
             Serial.println(todo.end);
-            Serial.println(todo.info);
+            // Serial.println(todo.info);
             Serial.println("=======================================");
 
             // String target_str = line;
@@ -337,11 +344,12 @@ UWORD drawTODO_OnePage_V2(sFONT *time_font, file_char *cn_font, sFONT *en_font, 
             // next_char = draw_result % 1000;
 
             String time_str = todo.start + " " + todo.end;
-            String info_str = todo.info;
-            info_str.trim();
+            // String info_str = todo.info;
+            // info_str.trim();
 
             Paint_DrawString_EN(DRAW_TODO_X_START, next_y, time_str.c_str(), time_font, BLACK, WHITE);
-            draw_result = Paint_DrawString_CN_From_File_V5(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y + time_font->Height, DRAW_TODO_Y_END, info_str, &PINGFANG12, &Font24, BLACK, WHITE);
+            // draw_result = Paint_DrawString_CN_From_File_V5(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y + time_font->Height, DRAW_TODO_Y_END, info_str, &PINGFANG12, &Font24, BLACK, WHITE);
+            draw_result = Paint_DrawString_CN_From_File_V5(DRAW_TODO_X_START, DRAW_TODO_X_END, next_y + time_font->Height, DRAW_TODO_Y_END, "info_str", &PINGFANG12, &Font24, BLACK, WHITE);
             use_line = (draw_result / 1000);
             next_y = next_y + paddingTop + time_font->Height + use_line * ((PINGFANG12.Height > Font24.Height) ? PINGFANG12.Height : Font24.Height);
             next_char = draw_result % 1000;
@@ -361,7 +369,8 @@ UWORD drawTODO_OnePage_V2(sFONT *time_font, file_char *cn_font, sFONT *en_font, 
                 // 没有剩余空间,结束绘制，返回下一个要绘制的条目索引
                 // 如果本条绘制完成，指向下一个索引
                 // 如果本条没有绘制完成，仍指向本条目
-                nextLine = (next_char == info_str.length()) ? nextLine : nextLine - 1;
+                // nextLine = (next_char == info_str.length()) ? nextLine : nextLine - 1;
+                // nextLine = (next_char == info_str.length()) ? nextLine : nextLine - 1;
                 break;
             }
         }

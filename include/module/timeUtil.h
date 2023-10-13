@@ -10,5 +10,5 @@ extern WiFiUDP udp;
 
 void updataTime(PAINT_TIME &sPaint_time);
 
-
+time_t getNtpTime();
 #endif

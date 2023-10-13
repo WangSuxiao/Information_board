@@ -149,11 +149,11 @@ void drawTODO()
     {
         EPD_4IN2_Init_Fast();
         // Paint_Clear(WHITE);
-        Paint_ClearWindows(DRAW_TODO_X_START,DRAW_TODO_Y_START,DRAW_TODO_X_END,DRAW_TODO_Y_END,WHITE);
+        Paint_ClearWindows(DRAW_TODO_X_START, DRAW_TODO_Y_START, DRAW_TODO_X_END, DRAW_TODO_Y_END, WHITE);
         Serial.print("开始的索引 :");
         Serial.println(todo_index);
         // todo_index = drawTODO_OnePage(&PINGFANG12, &Font24, todo_index);
-        todo_index = drawTODO_OnePage_V2(&Font16,&PINGFANG12, &Font20, todo_index, -1);
+        todo_index = drawTODO_OnePage_V2(&Font16, &PINGFANG12, &Font20, todo_index, -1);
         EPD_4IN2_Display(BlackImage);
         Serial.print("下一次的索引 :");
         Serial.println(todo_index);
@@ -195,7 +195,6 @@ void setup()
     // // Serial.println(String(line.indexOf("\t", 1)));
     // // Serial.println(String(line.indexOf("\t", 0)));
 
-
     // 网络连接
     wifiConnect();
     // wifiConfig(BlackImage);
@@ -224,9 +223,11 @@ void setup()
     update_futureweather.enable();
     update_todo.enable();
 
+    TodoManager todoManager = TodoManager("todos.txt");
+
     // 开启网络服务器
-    webserver.on("/upload", HTTP_ANY, []()
-                 { handleUpload(doc, webserver); });
+    webserver.on("/upload", HTTP_ANY, [&todoManager]()
+                 { handleUpload(doc, webserver, todoManager); });
     webserver.begin();
 }
 

@@ -3,8 +3,7 @@
 
 #include <Arduino.h>
 
-
-# define TODO_FILE "/todos.txt"
+#define TODO_FILE "/todos.txt"
 struct HourlyWeather
 {
     String fxTime;
@@ -25,12 +24,14 @@ struct City
     String address;
 };
 
-struct Todo {
-  int id;
-  String start;
-  String end;
-  int level;
-  String info;
+struct Todo
+{
+    uint32_t id;
+    time_t start;
+    time_t end;
+    uint8_t level;
+    //   String info;
+    uint32_t offset;
 };
 
 #define ICON_WEIGHT 32
@@ -41,5 +42,9 @@ struct Todo {
 #define WEATHER_DRAW_X_STEP 60
 #define WEATHER_DRAW_Y_STEP 80
 #define WEATHER_DRAW_FONT_SIZE 16
+
+#define EEPROMAddressFlag 0
+#define EEPROMAddressMode sizeof(int)
+
 
 #endif
