@@ -1,9 +1,9 @@
+#include <stdlib.h>
+#include <TaskScheduler.h>
+
 #include "board/DEV_Config.h"
 #include "board/EPD.h"
 #include "board/GUI_Paint.h"
-#include <stdlib.h>
-
-#include <TaskScheduler.h>
 
 #include "ui/drawBase.h"
 #include "module/lbs.h"
@@ -13,8 +13,7 @@
 #include "module/motto.h"
 #include "resource/icon.h"
 #include "module/wificonfig.h"
-// #include "server/webserver.h"
-#include "server/todo_server.h"
+#include "module/todoServer.h"
 #include "module/todo.h"
 
 UBYTE *BlackImage;
@@ -24,20 +23,11 @@ PAINT_TIME sPaint_time;
 bool WIFILOCATION = false;
 bool IPLOCATION = false;
 
-// String lon = "";
-// String lat = "";
 String cityId = "101190405";
-// String cityName = "";
-// String address = "";
-// City city = {
-//     "lon",
-//     lat,
-//     cityId,
-//     cityName,
-//     address};
+
 City city;
 DynamicJsonDocument doc(4096);
-
+TodoManager todoManager = TodoManager(TODO_FILE);
 Scheduler scheduler;
 ESP8266WebServer webserver(80);
 
@@ -45,6 +35,7 @@ ESP8266WebServer webserver(80);
 UBYTE old_min = 0;
 void update_time_task()
 {
+    Serial.println("=== time ===");
     struct tm timeinfo;
     int time_x = 52;
     if (getLocalTime(&timeinfo))
@@ -138,7 +129,7 @@ UWORD todo_index = 0;
 void drawTODO()
 {
 
-    int sum = getTODOQuantity();
+    int sum = todoManager.getSize();
     Serial.print("条目总和:");
     Serial.println(sum);
     if (todo_index == sum)
@@ -153,7 +144,7 @@ void drawTODO()
         Serial.print("开始的索引 :");
         Serial.println(todo_index);
         // todo_index = drawTODO_OnePage(&PINGFANG12, &Font24, todo_index);
-        todo_index = drawTODO_OnePage_V2(&Font16, &PINGFANG12, &Font20, todo_index, -1);
+        todo_index = drawTODO_OnePage(&Font16, &PINGFANG12, &Font20, todo_index, todoManager, -1);
         EPD_4IN2_Display(BlackImage);
         Serial.print("下一次的索引 :");
         Serial.println(todo_index);
@@ -176,10 +167,12 @@ void drawTODO()
     // }
 }
 
+
+
 Task update_time(1000 * 1, TASK_FOREVER, &update_time_task);
-Task update_realweather(1000 * 60 * 10, TASK_FOREVER, &update_realweather_task);
-Task update_futureweather(1000 * 60 * 15, TASK_FOREVER, &update_futureweather_task);
-Task update_todo(1000 * 20, TASK_FOREVER, &drawTODO);
+Task update_realweather(1000 * 6, TASK_FOREVER, &update_realweather_task);
+Task update_futureweather(1000 * 11, TASK_FOREVER, &update_futureweather_task);
+Task update_todo(1000 * 60 * 5, TASK_FOREVER, &drawTODO);
 
 void setup()
 {
@@ -213,6 +206,8 @@ void setup()
 
     // 开启子任务
     scheduler.init();
+
+
     scheduler.addTask(update_time);
     scheduler.addTask(update_realweather);
     scheduler.addTask(update_futureweather);
@@ -223,11 +218,14 @@ void setup()
     update_futureweather.enable();
     update_todo.enable();
 
-    TodoManager todoManager = TodoManager("todos.txt");
+
 
     // 开启网络服务器
-    webserver.on("/upload", HTTP_ANY, [&todoManager]()
+    webserver.on("/upload", HTTP_ANY, []()
                  { handleUpload(doc, webserver, todoManager); });
+
+    webserver.on("/printAll", HTTP_ANY, []()
+                 { handleReadAll(doc, webserver, todoManager); });
     webserver.begin();
 }
 
