@@ -1,7 +1,7 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-10-03 15:00:43
- * @LastEditTime : 2023-10-14 16:55:41
+ * @LastEditTime : 2023-10-25 14:36:20
  * @Description  : 处理客户端关于TODO的请求，提供CRUD
  *
  *                 改为类的实现方式
@@ -69,7 +69,6 @@ void handleUpload(DynamicJsonDocument &doc, ESP8266WebServer &server, TodoManage
                 todoManager.updateTodo(todo, todoMSG);
             }
         }
-
         server.send(200, "text/plain", "Operation completed successfully.");
     }
 }
@@ -96,7 +95,11 @@ void handleReadAll(DynamicJsonDocument &doc, ESP8266WebServer &server, TodoManag
         todoObj["start"] = todo.start;
         todoObj["end"] = todo.end;
         todoObj["level"] = todo.level;
-        // todoObj["info"] = line.substring(line.indexOf('\t') + 1);
+        todoObj["offset"] = todo.offset;
+        todoObj["info"] = todoManager.getTodoInfo(todo.id);
+        file.seek(todo.offset);
+        todoObj["raw"] = file.readStringUntil('\n');
+
     }
     doc["code"] = 200;
     doc["counter"] = todoManager.getSize();
