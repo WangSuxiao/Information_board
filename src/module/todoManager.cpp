@@ -1,10 +1,12 @@
 /*
  * @Author       : WangSuxiao
  * @Date         : 2023-10-03 15:00:43
- * @LastEditTime : 2023-10-14 21:47:41
+ * @LastEditTime : 2023-10-26 20:56:27
  * @Description  : 处理客户端关于TODO的请求，提供CRUD
  *
  *                 改为类的实现方式
+ *
+ *                 完善：删除逻辑&初始化时从文件中get有效条目
  * @Tips         :
  */
 
@@ -93,8 +95,8 @@ TodoManager::TodoManager(const String &filename) : todoFileName(filename)
 {
     Serial.println("=============== TodoManager 初始化 ================");
     File file = LittleFS.open(filename, "r");
-    EEPROM.get(EEPROMAddressFlag, flag);
-    EEPROM.get(EEPROMAddressMode, mode);
+    // EEPROM.get(EEPROMAddressFlag, flag);
+    // EEPROM.get(EEPROMAddressMode, mode);
     if (file)
     {
         String line;
@@ -112,6 +114,8 @@ TodoManager::TodoManager(const String &filename) : todoFileName(filename)
             todo.offset = file.position();
             line = file.readStringUntil('\n');
             Serial.println("==== 文件记录 ====");
+
+            Serial.println(todo.offset);
             Serial.println(line);
             // 解析todo
             ltindex = line.indexOf('\t');
@@ -130,6 +134,7 @@ TodoManager::TodoManager(const String &filename) : todoFileName(filename)
             todo.end = strtoll(timetmp.c_str(), NULL, 10);
             line = line.substring(ltindex + 1);
 
+
             ltindex = line.indexOf('\t');
             todo.level = line.substring(0, ltindex).toInt();
 
@@ -147,10 +152,26 @@ TodoManager::TodoManager(const String &filename) : todoFileName(filename)
             Serial.println(todo.level);
             Serial.print("Info : ");
             Serial.println(info);
-            Serial.print("Todos Size : ");
+
             // 获取插入位置
             auto insertPos = std::lower_bound(todos.begin(), todos.end(), todo, customCompare);
+            Serial.print("插入位置:");
+            Serial.println(std::distance(todos.begin(), insertPos));
+
+            if(todo.id == 999 && todo.start == 999 && todo.end == 999){
+                Serial.print("被删除的对象当前条目数量为 : ");
+                Serial.println(todos.size());
+                continue;
+            }else{
+                Serial.print("ID :  ");
+                Serial.print(todo.id);
+                Serial.print(" start  :  ");
+                Serial.print(todo.start);
+                Serial.print(" end :  ");
+                Serial.println(todo.end);
+            }
             todos.insert(insertPos, todo);
+            Serial.print("Todos Size : ");
             Serial.println(todos.size());
             Serial.println();
         }
@@ -201,11 +222,13 @@ bool TodoManager::insertTodo(Todo &todo, const String &info)
         {
             Serial.println("ID唯一，允许插入，插入数据为：");
             // 格式化数据并写入文件，用制表符分隔字段
-            String data = String(todo.id) + "\t" + String(todo.start) + "\t" + String(todo.end) + "\t" + String(todo.level) + "\t" + info;
+            String data = String(todo.id) + "\t" + String(todo.start) + "\t" + String(todo.end) + "\t" + String(todo.level) + "#" + info;
             Serial.println(data);
             // 修改todo记录的偏移量
+            file.seek(0, SeekEnd);
             todo.offset = file.position();
-            file.seek(todo.offset, SeekSet);
+            Serial.print("todo.offset : ");
+            Serial.println(todo.offset);
 
             Serial.println("存储信息：");
             Serial.print("String(todo.id) : ");
@@ -257,17 +280,36 @@ bool TodoManager::insertTodo(Todo &todo, const String &info)
  */
 bool TodoManager::deleteTodo(uint32_t idToDelete)
 {
+    Serial.println("=========deleteTodo===========");
     for (std::vector<Todo>::iterator it = todos.begin(); it != todos.end();)
     {
         if (it->id == idToDelete)
         {
+            Serial.print("delete item offset : ");
+            Serial.println(it->offset);
+            File file = LittleFS.open(todoFileName, "r+");
+            file.seek(it->offset);
+            file.write("999\t999\t999\t");
+            file.close();
+            file = LittleFS.open(todoFileName, "r");
+            while (file.available())
+            {
+                Serial.println(file.readStringUntil('\n'));
+            }
+            file.close();
+            Serial.print("item ID :");
+            Serial.println(it->id);
             it = todos.erase(it);
         }
         else
         {
             ++it;
+            Serial.print(it->id);
+            Serial.print(" : ");
+            Serial.println(it->offset);
         }
     }
+    Serial.println("=========deleteTodo===========");
     return isTodoIdUnique(idToDelete);
 }
 
@@ -320,6 +362,7 @@ bool TodoManager::cleanFile()
         // 根据todo记录的偏移位置读取一行
         oldFile.seek(todo.offset, SeekSet);
         String line = oldFile.readStringUntil('\n');
+        line.trim();
         // 修改todo记录的偏移位置
         todo.offset = newFile.position();
         // 将存入新的文件中
@@ -377,8 +420,9 @@ String TodoManager::getTodoInfo(uint32_t id)
         File file = LittleFS.open(todoFileName, "r");
         if (file)
         {
-            file.seek(todo.offset, SeekSet);
-            return "";
+            file.seek(todo.offset);
+            String line = file.readStringUntil('\n');
+            return line.substring(line.indexOf("#", 0) + 1);
         }
     }
     return "";
