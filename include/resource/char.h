@@ -22,9 +22,15 @@ typedef struct
 typedef struct _mytFont
 {
     const char *filename;
-    uint32_t Length;
-    uint16_t Width;
-    uint16_t Height;
+    uint32_t Length;    // 字库大小
+    uint16_t Width;     // 字模宽
+    uint16_t Height;    // 字模高
+    uint16_t Indentation;   // 字模自带缩进
+    uint16_t Indentation_s; // 较短的缩进
+    uint16_t Indentation_l; // 较大的缩进
+    uint16_t Indentation_L; // 最大的缩进
+    uint16_t Indentation_t; // 去除顶部的几行
+    uint16_t Indentation_b; // 去除底部的几行
 } file_char_acsll;
 
 extern file_char PINGFANG18;
@@ -32,6 +38,12 @@ extern file_char PINGFANG16;
 extern file_char PINGFANG12;
 extern file_char CN18;
 extern file_char_acsll FXLED36;
+// extern file_char_acsll _TIME_14;
+// extern file_char_acsll _TIME_10;
+// extern file_char_acsll _TIME_12;
+extern file_char_acsll TODO_TIME_LIGHT10;
+extern file_char_acsll ASCII_Adobe_L14;
+extern file_char_acsll TODO_INFO_ASCII_PINGFANG18;
 
 int read(const char *file_name, uint8_t *data_space, size_t length, uint32_t offset);
 int index_cn(const char *file_name, const char *p_text);
