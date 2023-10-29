@@ -19,5 +19,8 @@
 
 
 // UWORD drawTODO_OnePage(sFONT *time_font, file_char *cn_font, sFONT *en_font, int start, int paddingTop);
-UWORD drawTODO_OnePage(sFONT *time_font, file_char *cn_font, sFONT *en_font, int start, TodoManager &todoManager, int paddingTop);
+UWORD drawTODO_OnePage(file_char_acsll *time_font, file_char *cn_font, sFONT *en_font, int start, TodoManager &todoManager, int paddingTop);
+UWORD drawTODO_OnePage_V2(file_char_acsll *time_font, file_char *cn_font, file_char_acsll *en_font, int start, TodoManager &todoManager, int paddingTop);
+u32_t drawTODO_OnePage_V3(file_char_acsll *time_font, file_char *cn_font, file_char_acsll *en_font, int itemStart, int charStart, TodoManager &todoManager, int paddingTop);
+
 #endif
