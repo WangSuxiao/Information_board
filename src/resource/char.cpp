@@ -3,7 +3,20 @@
 String serverUrl = "http://www.wangsuxiao.com";
 String resource = "/addchar?ch=";
 
-file_char_acsll FXLED36{"/font/FXLED36.tf", 13680, 32, 36};
+file_char_acsll FXLED36{"/font/FXLED36.tf", 13680, 32, 36, 0, 0, 0, 0, 0, 0};
+// file_char_acsll _TIME_14{"/font/tm/yahei14.tf", 1350, 16, 25, 0, 0, 0, 0, 0};
+// file_char_acsll _TIME_10{"/font/tm/yahei10.tf", 570, 8, 19, 0, 0, 0, 0, 0};
+// file_char_acsll _TIME_12{"/font/tm/light12.tf", 459, 8, 17, 0, 0, 0, 0, 0};
+
+// 等线 Light 10号
+file_char_acsll TODO_TIME_LIGHT10{"/font/tm/light10.tf", 378, 8, 14, 0, 0, 0, 0, 0, 0};
+
+// adobe 细体 14号
+file_char_acsll ASCII_Adobe_L14{"/font/tm/adobeL14.tf", 6270, 24, 22,  5,  5, 10, 16,  9, 9};
+
+file_char_acsll TODO_INFO_ASCII_PINGFANG18{"/font/tm/pingfang18ascii.tf", 9405, 24, 33,  2,  0, 9, 17,  7, 7};
+
+
 
 file_char PINGFANG18{"/font/cn18/index.txt", "/font/cn18/pingfang_18.tf", 24, 33, 18};
 file_char PINGFANG16{"/font/cn16/index.txt", "/font/cn16/pingfang_16.tf", 24, 21, 16};
@@ -190,8 +203,6 @@ int index_cn(const char *file_name, const char *p_text)
     free(buffer);
     return index;
 }
-
-
 
 int index_cn_v2(File fp, int filelen, const char *p_text, int bufferlen, unsigned char *buffer)
 {
